@@ -98,6 +98,12 @@ redis_data/
 test-results/
 coverage.xml
 
+# ---- Playwright ----
+playwright-report/
+test-results/
+.playwright-mcp/
+blob-report/
+
 # ---- Misc ----
 *.bak
 *.tmp

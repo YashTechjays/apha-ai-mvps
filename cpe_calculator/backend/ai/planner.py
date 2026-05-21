@@ -3,7 +3,7 @@ Core AI CPE plan generator.
 Takes user inputs + state requirements + course catalog → personalized plan.
 """
 import json
-import anthropic
+from openai import OpenAI
 from pathlib import Path
 from datetime import date, datetime
 from backend.ai.prompts import CPE_PLAN_PROMPT
@@ -12,7 +12,7 @@ from backend.utils.logger import get_logger
 
 logger = get_logger(__name__)
 settings = get_settings()
-client = anthropic.Anthropic(api_key=settings.anthropic_api_key) if settings.anthropic_api_key else None
+client = OpenAI(api_key=settings.openai_api_key) if settings.openai_api_key else None
 
 _state_data = json.loads((Path(__file__).parent.parent / "data" / "state_requirements.json").read_text())
 _course_data = json.loads((Path(__file__).parent.parent / "data" / "apha_courses.json").read_text())
@@ -55,13 +55,12 @@ def build_course_list_text(courses: list) -> str:
 
 
 def _fallback_plan(state_req, hours_gap, days_until, relevant_courses, member_savings, state_name) -> dict:
-    """Deterministic plan when Claude API is unavailable."""
+    """Deterministic plan when LLM API is unavailable."""
     mandatory_topics = state_req.get("special_requirements", [])
     selected = []
     total = 0.0
     used_ids = set()
 
-    # Mandatory law first
     for req in mandatory_topics:
         for c in relevant_courses:
             if c["id"] in used_ids:
@@ -79,7 +78,6 @@ def _fallback_plan(state_req, hours_gap, days_until, relevant_courses, member_sa
                 total += c["cpe_hours"]
                 break
 
-    # Fill remaining gap
     for c in relevant_courses:
         if c["id"] in used_ids or total >= hours_gap:
             continue
@@ -138,18 +136,18 @@ def generate_cpe_plan(
         )
         try:
             logger.info(f"Generating CPE plan: {state} | {hours_gap}h gap | {days_until} days")
-            response = client.messages.create(
-                model="claude-sonnet-4-20250514", max_tokens=1500,
+            response = client.chat.completions.create(
+                model=settings.openai_model_name, max_tokens=1500,
                 messages=[{"role": "user", "content": prompt}],
             )
-            raw = response.content[0].text.strip()
+            raw = (response.choices[0].message.content or "").strip()
             if raw.startswith("```"):
                 raw = raw.split("```")[1]
                 if raw.startswith("json"):
                     raw = raw[4:]
             plan = json.loads(raw.strip())
         except Exception as exc:
-            logger.warning(f"Claude unavailable, using fallback: {exc}")
+            logger.warning(f"OpenAI unavailable, using fallback: {exc}")
 
     if plan is None:
         plan = _fallback_plan(state_req, hours_gap, days_until, relevant_courses, member_savings, state_req["name"])

@@ -62,6 +62,6 @@ def auth_headers(client):
 
 
 @pytest.fixture(autouse=True)
-def _stub_anthropic(monkeypatch):
+def _stub_llm(monkeypatch):
     from backend.ai import message_generator
     monkeypatch.setattr(message_generator, "client", None)

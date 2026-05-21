@@ -1,5 +1,5 @@
 """Core concierge logic — takes conversation history and returns AI response."""
-import anthropic
+from openai import OpenAI
 from typing import List, Dict
 from backend.ai.prompts import SYSTEM_PROMPT, LEAD_CAPTURE_PROMPT
 from backend.ai.intent_detector import detect_intent
@@ -10,7 +10,7 @@ from backend.utils.logger import get_logger
 logger = get_logger(__name__)
 settings = get_settings()
 
-client = anthropic.Anthropic(api_key=settings.anthropic_api_key)
+client = OpenAI(api_key=settings.openai_api_key) if settings.openai_api_key else None
 
 
 def build_system_prompt(context: str, turn_count: int, intent: str) -> str:
@@ -45,7 +45,6 @@ def generate_response(
     intent = detect_intent(user_message)
     logger.info(f"Detected intent: {intent} | Turn: {turn_count}")
 
-    # Handle off-topic without calling Claude
     if intent == "off_topic":
         return {
             "response": (
@@ -67,18 +66,17 @@ def generate_response(
         lead_nudge = LEAD_CAPTURE_PROMPT.format(turn_count=turn_count)
         system_prompt += f"\n\nIMPORTANT: {lead_nudge}"
 
-    messages = []
+    messages = [{"role": "system", "content": system_prompt}]
     for msg in conversation_history[-10:]:
         messages.append({"role": msg["role"], "content": msg["content"]})
     messages.append({"role": "user", "content": user_message})
 
-    response = client.messages.create(
-        model="claude-sonnet-4-20250514",
+    response = client.chat.completions.create(
+        model=settings.openai_model_name,
         max_tokens=600,
-        system=system_prompt,
         messages=messages,
     )
-    response_text = response.content[0].text
+    response_text = response.choices[0].message.content or ""
 
     tier_rec = None
     tier_keywords = {

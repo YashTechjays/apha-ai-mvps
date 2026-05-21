@@ -58,7 +58,7 @@ def client():
 
 
 @pytest.fixture(autouse=True)
-def _no_anthropic(monkeypatch):
-    # Force fallback plan path so tests don't hit Claude API
+def _no_llm(monkeypatch):
+    # Force fallback plan path so tests don't hit the LLM API
     from backend.ai import planner
     monkeypatch.setattr(planner, "client", None)

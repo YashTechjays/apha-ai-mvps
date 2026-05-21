@@ -1,4 +1,4 @@
-"""Top-level clinical assistant that orchestrates retrieval + Claude + safety."""
+"""Top-level clinical assistant that orchestrates retrieval + LLM + safety."""
 from __future__ import annotations
 
 import time
@@ -15,11 +15,11 @@ from backend.utils.logger import get_logger
 logger = get_logger(__name__)
 
 
-# Lazy-init module for testability — tests can set this to None
+# Lazy-init module for testability — tests can set OpenAI to None
 try:
-    import anthropic  # type: ignore
+    from openai import OpenAI  # type: ignore
 except Exception:  # pragma: no cover
-    anthropic = None
+    OpenAI = None  # type: ignore
 
 
 @dataclass
@@ -49,25 +49,24 @@ class AssistantResponse:
 
 
 class ClinicalAssistant:
-    def __init__(self, model: str = "claude-sonnet-4-20250514"):
-        self.model = model
+    def __init__(self, model: Optional[str] = None):
+        self.model = model or settings.openai_model_name
         self.retriever = get_retriever()
 
     def _get_client(self):
-        if anthropic is None:
+        if OpenAI is None:
             return None
-        if not settings.anthropic_api_key:
+        if not settings.openai_api_key:
             return None
         try:
-            return anthropic.Anthropic(api_key=settings.anthropic_api_key)
+            return OpenAI(api_key=settings.openai_api_key)
         except Exception as e:
-            logger.warning(f"Anthropic client init failed: {e}")
+            logger.warning(f"OpenAI client init failed: {e}")
             return None
 
     def answer(self, query: str, category: Optional[str] = None) -> AssistantResponse:
         start = time.time()
 
-        # 1. Safety check
         sc = safety_check(query)
         if sc["safe"] != "true":
             return AssistantResponse(
@@ -87,17 +86,14 @@ class ClinicalAssistant:
                 used_fallback=True,
             )
 
-        # 2. Classify
         query_type = classify_query(query)
 
-        # 3. Retrieve
         chunks = self.retriever.retrieve_with_diversity(query)
         chunk_dicts = [
             (c.to_dict() if hasattr(c, "to_dict") else dict(c)) for c in chunks
         ]
         citations = build_citations(chunks)
 
-        # 4. Generate answer
         client = self._get_client()
         used_fallback = client is None
         if used_fallback:
@@ -105,9 +101,9 @@ class ClinicalAssistant:
             answer_tokens = len(answer_text.split())
         else:
             try:
-                answer_text, answer_tokens = self._call_claude(query, query_type, chunk_dicts, client)
+                answer_text, answer_tokens = self._call_llm(query, query_type, chunk_dicts, client)
             except Exception as e:
-                logger.warning(f"Claude call failed, falling back: {e}")
+                logger.warning(f"LLM call failed, falling back: {e}")
                 answer_text = self._fallback_answer(query, query_type, chunk_dicts, citations)
                 answer_tokens = len(answer_text.split())
                 used_fallback = True
@@ -126,8 +122,7 @@ class ClinicalAssistant:
             used_fallback=used_fallback,
         )
 
-    # ------------------------------------------------------------------ #
-    def _call_claude(
+    def _call_llm(
         self,
         query: str,
         query_type: str,
@@ -135,21 +130,17 @@ class ClinicalAssistant:
         client,
     ) -> tuple[str, int]:
         user_prompt = build_user_prompt(query, chunks, query_type)
-        msg = client.messages.create(
+        resp = client.chat.completions.create(
             model=self.model,
             max_tokens=settings.max_answer_tokens,
-            system=SYSTEM_PROMPT,
-            messages=[{"role": "user", "content": user_prompt}],
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": user_prompt},
+            ],
         )
-        # Extract text from content blocks
-        text_parts: List[str] = []
-        for block in getattr(msg, "content", []):
-            t = getattr(block, "text", None)
-            if t:
-                text_parts.append(t)
-        answer = "\n".join(text_parts).strip()
-        usage = getattr(msg, "usage", None)
-        tokens = getattr(usage, "output_tokens", 0) if usage else len(answer.split())
+        answer = (resp.choices[0].message.content or "").strip()
+        usage = getattr(resp, "usage", None)
+        tokens = getattr(usage, "completion_tokens", 0) if usage else len(answer.split())
         return answer, tokens
 
     def _fallback_answer(
@@ -181,12 +172,10 @@ class ClinicalAssistant:
         }
         intro = intro_by_type.get(query_type, intro_by_type["general"])
 
-        # Pull the most relevant passage from each top chunk
         section_lines = [intro, ""]
         for ch in chunks[:4]:
             title = ch.get("source_title", "Unknown")
             text = (ch.get("text") or "").strip()
-            # Trim to first 400 chars of meaningful text
             snippet = text[:600]
             if len(text) > 600:
                 snippet += "..."
@@ -196,7 +185,7 @@ class ClinicalAssistant:
             section_lines.append("")
 
         section_lines.append(
-            "_This is a deterministic reference-library summary (Claude API not configured). "
+            "_This is a deterministic reference-library summary (LLM API not configured). "
             "Verify all clinical decisions against primary literature and patient-specific factors._"
         )
         section_lines.append("")

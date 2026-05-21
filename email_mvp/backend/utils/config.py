@@ -4,7 +4,9 @@ from functools import lru_cache
 
 class Settings(BaseSettings):
     database_url: str = "postgresql://apha:apha_secret@localhost:5434/email_db"
-    anthropic_api_key: str = ""
+    openai_api_key: str = ""
+    openai_model_name: str = "gpt-4o-mini"
+    openai_subject_model_name: str = "gpt-4o-mini"
     sendgrid_api_key: str = ""
     from_email: str = "noreply@pharmacist.com"
     from_name: str = "APhA Membership Team"

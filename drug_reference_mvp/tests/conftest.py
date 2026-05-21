@@ -1,4 +1,4 @@
-"""Pytest fixtures — SQLite test DB + Anthropic disabled."""
+"""Pytest fixtures — SQLite test DB + LLM disabled."""
 from __future__ import annotations
 
 import os
@@ -22,10 +22,10 @@ _ = PG_UUID  # keep import for potential future patching
 
 
 @pytest.fixture(autouse=True)
-def disable_anthropic(monkeypatch):
+def disable_llm(monkeypatch):
     """Force the clinical assistant into deterministic fallback mode."""
     from backend.ai import clinical_assistant as ca
-    monkeypatch.setattr(ca, "anthropic", None)
+    monkeypatch.setattr(ca, "OpenAI", None)
     yield
 
 

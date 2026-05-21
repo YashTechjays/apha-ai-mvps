@@ -1,0 +1,27 @@
+{
+  "name": "apha-ai-mvps",
+  "version": "1.0.0",
+  "description": "ML-powered member churn prediction system for the American Pharmacists Association, built by the Techjays AI Team.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/YashTechjays/apha-ai-mvps.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/YashTechjays/apha-ai-mvps/issues"
+  },
+  "homepage": "https://github.com/YashTechjays/apha-ai-mvps#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.60.0"
+  }
+}

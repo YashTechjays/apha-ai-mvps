@@ -1,5 +1,5 @@
 import json
-from anthropic import Anthropic
+from openai import OpenAI
 from backend.ai.benefit_valuation import BenefitSummary
 from backend.ai.prompts import EMAIL_GENERATION_PROMPT, SUBJECT_LINE_VARIANTS_PROMPT
 from backend.utils.config import get_settings
@@ -9,8 +9,8 @@ logger = get_logger(__name__)
 settings = get_settings()
 
 
-def _client() -> Anthropic:
-    return Anthropic(api_key=settings.anthropic_api_key)
+def _client() -> OpenAI:
+    return OpenAI(api_key=settings.openai_api_key)
 
 
 def generate_email_content(summary: BenefitSummary) -> dict:
@@ -38,13 +38,12 @@ def generate_email_content(summary: BenefitSummary) -> dict:
     )
 
     try:
-        response = _client().messages.create(
-            model="claude-sonnet-4-20250514",
+        response = _client().chat.completions.create(
+            model=settings.openai_model_name,
             max_tokens=settings.max_tokens_per_email,
             messages=[{"role": "user", "content": prompt}],
         )
-        raw = response.content[0].text.strip()
-        # Strip markdown code fences if present
+        raw = (response.choices[0].message.content or "").strip()
         if raw.startswith("```"):
             raw = raw.split("```")[1]
             if raw.startswith("json"):
@@ -63,12 +62,12 @@ def generate_subject_variants(summary: BenefitSummary) -> list[str]:
         roi_multiplier=summary.roi_multiplier,
     )
     try:
-        response = _client().messages.create(
-            model="claude-haiku-4-5-20251001",
+        response = _client().chat.completions.create(
+            model=settings.openai_subject_model_name,
             max_tokens=200,
             messages=[{"role": "user", "content": prompt}],
         )
-        raw = response.content[0].text.strip()
+        raw = (response.choices[0].message.content or "").strip()
         if raw.startswith("```"):
             raw = raw.split("```")[1]
             if raw.startswith("json"):

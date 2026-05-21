@@ -1,5 +1,5 @@
 import json
-import anthropic
+from openai import OpenAI
 from backend.db.models.member import Member
 from backend.db.models.crosssell_score import CrossSellScore
 from backend.ai.prompts import (
@@ -11,7 +11,7 @@ from backend.utils.logger import get_logger
 
 logger = get_logger(__name__)
 settings = get_settings()
-client = anthropic.Anthropic(api_key=settings.anthropic_api_key) if settings.anthropic_api_key else None
+client = OpenAI(api_key=settings.openai_api_key) if settings.openai_api_key else None
 
 ACTIVE_STREAM_LABELS = {
     "education": "CPE / Learning Library",
@@ -76,14 +76,14 @@ def generate_email_nudge(member: Member, score: CrossSellScore) -> dict:
             cta_url=PRODUCT_CTA_URLS.get(score.product, "https://pharmacist.com"),
         )
         try:
-            response = client.messages.create(
-                model="claude-sonnet-4-20250514",
+            response = client.chat.completions.create(
+                model=settings.openai_model_name,
                 max_tokens=400,
                 messages=[{"role": "user", "content": prompt}],
             )
-            result = _parse_json_response(response.content[0].text)
+            result = _parse_json_response(response.choices[0].message.content or "")
         except Exception as e:
-            logger.warning(f"Claude email gen failed, using fallback: {e}")
+            logger.warning(f"OpenAI email gen failed, using fallback: {e}")
             result = _fallback_email(member, score)
     else:
         result = _fallback_email(member, score)
@@ -104,14 +104,14 @@ def generate_banner_nudge(member: Member, score: CrossSellScore) -> dict:
             top_reason=top_reason,
         )
         try:
-            response = client.messages.create(
-                model="claude-sonnet-4-20250514",
+            response = client.chat.completions.create(
+                model=settings.openai_model_name,
                 max_tokens=150,
                 messages=[{"role": "user", "content": prompt}],
             )
-            result = _parse_json_response(response.content[0].text)
+            result = _parse_json_response(response.choices[0].message.content or "")
         except Exception as e:
-            logger.warning(f"Claude banner gen failed, using fallback: {e}")
+            logger.warning(f"OpenAI banner gen failed, using fallback: {e}")
             result = _fallback_banner(member, score)
     else:
         result = _fallback_banner(member, score)

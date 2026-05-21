@@ -21,7 +21,8 @@ services:
       - "8001:8001"
     environment:
       - DATABASE_URL=postgresql://apha:apha_secret@postgres:5432/concierge_db
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL_NAME=${OPENAI_MODEL_NAME:-gpt-4o-mini}
       - CHROMA_PERSIST_DIR=/app/chroma_store
       - ENV=development
     depends_on:

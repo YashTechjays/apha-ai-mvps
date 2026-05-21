@@ -7,7 +7,8 @@ class Settings(BaseSettings):
     redis_url: str = "redis://localhost:6381/0"
     env: str = "development"
 
-    anthropic_api_key: str = ""
+    openai_api_key: str = ""
+    openai_model_name: str = "gpt-4o-mini"
     chroma_persist_dir: str = "./chroma_store"
     chroma_collection_name: str = "apha_drug_reference"
     rag_top_k: int = 6
