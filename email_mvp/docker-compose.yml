@@ -1,0 +1,46 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: apha
+      POSTGRES_PASSWORD: apha_secret
+      POSTGRES_DB: email_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U apha"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  backend:
+    build: ./backend
+    ports:
+      - "8002:8002"
+    environment:
+      - DATABASE_URL=postgresql://apha:apha_secret@postgres:5432/email_db
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      - FROM_EMAIL=noreply@pharmacist.com
+      - FROM_NAME=APhA Membership Team
+      - ENV=development
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    command: uvicorn main:app --host 0.0.0.0 --port 8002 --reload
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./frontend:/app
+    command: sh -c "npm install && npm run dev -- --host --port 3002"
+    environment:
+      - VITE_API_URL=http://localhost:8002
+volumes:
+  postgres_data:

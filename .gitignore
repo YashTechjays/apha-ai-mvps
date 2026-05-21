@@ -1,0 +1,104 @@
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.tox/
+build/
+dist/
+*.egg-info/
+*.egg
+pip-log.txt
+
+# Virtualenvs
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# ---- Environment / Secrets ----
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+credentials.json
+secrets.json
+*.local
+
+# ---- Node / Frontend ----
+node_modules/
+.pnpm-store/
+.pnp
+.pnp.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.next/
+.nuxt/
+dist/
+build/
+.vite/
+*.tsbuildinfo
+
+# ---- IDE / OS ----
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+*.sublime-*
+
+# ---- Logs / Databases / Caches ----
+*.log
+logs/
+*.sqlite
+*.sqlite3
+*.db
+chroma_store/
+chroma_data/
+.cache/
+
+# ---- ML / Data Artifacts ----
+mlruns/
+mlflow.db
+*.pkl
+*.joblib
+*.h5
+*.onnx
+*.pt
+models_artifacts/
+data/raw/
+data/processed/
+*.parquet
+*.feather
+
+# ---- Airflow ----
+airflow.cfg
+airflow.db
+airflow-webserver.pid
+unittests.cfg
+logs/airflow/
+
+# ---- Docker / Compose volumes ----
+postgres_data/
+redis_data/
+
+# ---- Test artifacts ----
+.coverage.*
+.hypothesis/
+test-results/
+coverage.xml
+
+# ---- Misc ----
+*.bak
+*.tmp
+.ipynb_checkpoints/

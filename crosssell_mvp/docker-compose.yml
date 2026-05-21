@@ -1,0 +1,73 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: apha
+      POSTGRES_PASSWORD: apha_secret
+      POSTGRES_DB: crosssell_db
+    ports:
+      - "5436:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U apha"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 5
+  backend:
+    build: ./backend
+    ports:
+      - "8004:8004"
+    environment:
+      - DATABASE_URL=postgresql://apha:apha_secret@postgres:5432/crosssell_db
+      - REDIS_URL=redis://redis:6379/0
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      - FROM_EMAIL=membership@pharmacist.com
+      - SECRET_KEY=dev-secret-key
+      - ENV=development
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - mlflow_data:/app/mlruns
+    command: uvicorn main:app --host 0.0.0.0 --port 8004 --reload
+  celery_worker:
+    build: ./backend
+    environment:
+      - DATABASE_URL=postgresql://apha:apha_secret@postgres:5432/crosssell_db
+      - REDIS_URL=redis://redis:6379/0
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      - ENV=development
+    depends_on:
+      - redis
+      - postgres
+    volumes:
+      - ./backend:/app
+    command: celery -A backend.nudge_engine.tasks worker --loglevel=info
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    ports:
+      - "3004:3004"
+    volumes:
+      - ./frontend:/app
+    command: sh -c "npm install && npm run dev -- --host --port 3004"
+    environment:
+      - VITE_API_URL=http://localhost:8004
+volumes:
+  postgres_data:
+  mlflow_data:
