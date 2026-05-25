@@ -7,7 +7,10 @@ class Settings(BaseSettings):
     openai_api_key: str = ""
     openai_model_name: str = "gpt-4o-mini"
     openai_subject_model_name: str = "gpt-4o-mini"
-    sendgrid_api_key: str = ""
+    smtp_host: str = "smtp.postmarkapp.com"
+    smtp_port: int = 587
+    smtp_username: str = ""
+    smtp_password: str = ""
     from_email: str = "noreply@pharmacist.com"
     from_name: str = "APhA Membership Team"
     env: str = "development"

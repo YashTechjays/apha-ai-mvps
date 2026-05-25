@@ -1,6 +1,6 @@
 """
-SendGrid — trigger CPE nurture email sequence for captured leads.
-MVP: mock. Production: set SENDGRID_API_KEY.
+Postmark SMTP — trigger CPE nurture email sequence for captured leads.
+MVP: mock. Production: set SMTP_USERNAME and SMTP_PASSWORD.
 """
 from backend.db.models.lead import Lead
 from backend.utils.config import get_settings
@@ -18,7 +18,7 @@ def trigger_cpe_nurture_sequence(lead: Lead):
       Email 3 (day 7):   "APhA membership includes all your required CPE free"
     """
     logger.info(
-        f"[SENDGRID MOCK] Triggering CPE nurture for {lead.email} | "
+        f"[SMTP MOCK] Triggering CPE nurture for {lead.email} | "
         f"State: {lead.state} | Gap: {lead.hours_gap}h | "
         f"Days: {lead.days_until_renewal}"
     )

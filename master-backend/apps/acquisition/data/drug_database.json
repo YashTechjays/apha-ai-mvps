@@ -1,0 +1,156 @@
+{
+  "drugs": [
+    {"id": "warfarin", "name": "Warfarin", "aliases": ["coumadin", "jantoven"]},
+    {"id": "aspirin", "name": "Aspirin", "aliases": ["asa", "acetylsalicylic acid"]},
+    {"id": "metformin", "name": "Metformin", "aliases": ["glucophage"]},
+    {"id": "lisinopril", "name": "Lisinopril", "aliases": ["prinivil", "zestril"]},
+    {"id": "atorvastatin", "name": "Atorvastatin", "aliases": ["lipitor"]},
+    {"id": "simvastatin", "name": "Simvastatin", "aliases": ["zocor"]},
+    {"id": "amoxicillin", "name": "Amoxicillin", "aliases": ["amoxil"]},
+    {"id": "ciprofloxacin", "name": "Ciprofloxacin", "aliases": ["cipro"]},
+    {"id": "clarithromycin", "name": "Clarithromycin", "aliases": ["biaxin"]},
+    {"id": "fluconazole", "name": "Fluconazole", "aliases": ["diflucan"]},
+    {"id": "metoprolol", "name": "Metoprolol", "aliases": ["lopressor", "toprol"]},
+    {"id": "amlodipine", "name": "Amlodipine", "aliases": ["norvasc"]},
+    {"id": "omeprazole", "name": "Omeprazole", "aliases": ["prilosec"]},
+    {"id": "sertraline", "name": "Sertraline", "aliases": ["zoloft"]},
+    {"id": "citalopram", "name": "Citalopram", "aliases": ["celexa"]},
+    {"id": "tramadol", "name": "Tramadol", "aliases": ["ultram"]},
+    {"id": "ibuprofen", "name": "Ibuprofen", "aliases": ["advil", "motrin"]},
+    {"id": "naproxen", "name": "Naproxen", "aliases": ["aleve", "naprosyn"]},
+    {"id": "amiodarone", "name": "Amiodarone", "aliases": ["cordarone", "pacerone"]},
+    {"id": "digoxin", "name": "Digoxin", "aliases": ["lanoxin"]},
+    {"id": "furosemide", "name": "Furosemide", "aliases": ["lasix"]},
+    {"id": "spironolactone", "name": "Spironolactone", "aliases": ["aldactone"]},
+    {"id": "losartan", "name": "Losartan", "aliases": ["cozaar"]},
+    {"id": "gabapentin", "name": "Gabapentin", "aliases": ["neurontin"]},
+    {"id": "levothyroxine", "name": "Levothyroxine", "aliases": ["synthroid", "levoxyl"]},
+    {"id": "metronidazole", "name": "Metronidazole", "aliases": ["flagyl"]},
+    {"id": "clopidogrel", "name": "Clopidogrel", "aliases": ["plavix"]},
+    {"id": "apixaban", "name": "Apixaban", "aliases": ["eliquis"]},
+    {"id": "rivaroxaban", "name": "Rivaroxaban", "aliases": ["xarelto"]},
+    {"id": "lithium", "name": "Lithium", "aliases": ["eskalith", "lithobid"]}
+  ],
+  "interactions": [
+    {
+      "drug_a": "warfarin", "drug_b": "amiodarone",
+      "severity": "major",
+      "mechanism": "CYP2C9 and CYP3A4 inhibition by amiodarone significantly increases warfarin exposure",
+      "clinical_effect": "INR may double or triple; major bleeding risk",
+      "management": "Reduce warfarin dose by 30-50% when starting amiodarone. Monitor INR every 3-5 days for several weeks. Amiodarone's effect persists for months after discontinuation.",
+      "onset": "Delayed (weeks to months due to amiodarone's long half-life)"
+    },
+    {
+      "drug_a": "warfarin", "drug_b": "aspirin",
+      "severity": "major",
+      "mechanism": "Pharmacodynamic: aspirin inhibits platelet aggregation + COX-mediated anticoagulation potentiation",
+      "clinical_effect": "Significantly increased bleeding risk, particularly GI bleeding",
+      "management": "Avoid combination unless clearly indicated (e.g., mechanical heart valve + AF). If necessary, use lowest aspirin dose (81mg); consider PPI co-prescription.",
+      "onset": "Rapid"
+    },
+    {
+      "drug_a": "warfarin", "drug_b": "fluconazole",
+      "severity": "major",
+      "mechanism": "CYP2C9 inhibition by fluconazole markedly reduces warfarin metabolism",
+      "clinical_effect": "INR elevation of 50-100% within 3-5 days; major bleeding risk",
+      "management": "Reduce warfarin dose ~25-50%. Check INR 3-5 days after fluconazole initiation and after completion.",
+      "onset": "Rapid (2-3 days)"
+    },
+    {
+      "drug_a": "simvastatin", "drug_b": "clarithromycin",
+      "severity": "major",
+      "mechanism": "Clarithromycin is a potent CYP3A4 inhibitor; markedly increases simvastatin plasma levels",
+      "clinical_effect": "Up to 10-fold increase in simvastatin AUC; significantly elevated myopathy and rhabdomyolysis risk",
+      "management": "CONTRAINDICATED. Hold simvastatin during clarithromycin course. Use azithromycin as alternative when possible. If statin needed, use pravastatin or rosuvastatin (not CYP3A4 substrates).",
+      "onset": "Rapid"
+    },
+    {
+      "drug_a": "atorvastatin", "drug_b": "clarithromycin",
+      "severity": "major",
+      "mechanism": "CYP3A4 inhibition increases atorvastatin exposure",
+      "clinical_effect": "3-5 fold increase in atorvastatin AUC; increased myopathy risk",
+      "management": "Do not exceed atorvastatin 20mg during clarithromycin therapy. Consider switching to azithromycin or temporarily holding atorvastatin.",
+      "onset": "Rapid"
+    },
+    {
+      "drug_a": "sertraline", "drug_b": "tramadol",
+      "severity": "major",
+      "mechanism": "Serotonergic synergy; tramadol inhibits serotonin reuptake AND is metabolized by CYP2D6",
+      "clinical_effect": "Risk of serotonin syndrome (fever, agitation, myoclonus, diarrhea, tachycardia, diaphoresis)",
+      "management": "Avoid combination. If pain management needed, consider non-serotonergic alternatives. If used, counsel patient on serotonin syndrome symptoms; start with low tramadol dose.",
+      "onset": "Variable; can be rapid"
+    },
+    {
+      "drug_a": "citalopram", "drug_b": "tramadol",
+      "severity": "major",
+      "mechanism": "Dual serotonergic mechanism; citalopram + tramadol both increase serotonergic tone",
+      "clinical_effect": "Serotonin syndrome risk; QT prolongation risk (citalopram already prolongs QT)",
+      "management": "Avoid. Use alternative analgesics. If combination unavoidable, monitor closely for serotonin syndrome and QTc prolongation.",
+      "onset": "Variable"
+    },
+    {
+      "drug_a": "lisinopril", "drug_b": "ibuprofen",
+      "severity": "moderate",
+      "mechanism": "NSAIDs reduce prostaglandin-mediated vasodilation, counteracting ACE inhibitor antihypertensive effect; combined renal effects increase AKI risk",
+      "clinical_effect": "Reduced antihypertensive efficacy; increased risk of acute kidney injury (especially in elderly, dehydrated, or CKD patients)",
+      "management": "Avoid chronic NSAID use with ACE inhibitors. For acute pain, use acetaminophen preferentially. Monitor BP and renal function if NSAIDs necessary.",
+      "onset": "Days to weeks"
+    },
+    {
+      "drug_a": "lisinopril", "drug_b": "spironolactone",
+      "severity": "moderate",
+      "mechanism": "Dual mechanism potassium retention: ACE inhibitor reduces aldosterone, spironolactone blocks aldosterone receptor",
+      "clinical_effect": "Significant hyperkalemia risk, particularly in CKD, diabetes, or elderly patients",
+      "management": "Monitor potassium and renal function at baseline, 1 week after starting, and periodically. Avoid combination if K+ >5.0 mEq/L or eGFR <30. Dose adjustment often needed.",
+      "onset": "Days to weeks"
+    },
+    {
+      "drug_a": "metformin", "drug_b": "furosemide",
+      "severity": "moderate",
+      "mechanism": "Furosemide can increase metformin plasma levels by reducing renal clearance; diuretic-induced dehydration reduces GFR",
+      "clinical_effect": "Increased metformin levels; if dehydration + reduced GFR, lactic acidosis risk",
+      "management": "Monitor renal function during diuretic initiation or dose changes. Hold metformin if acute illness causing dehydration. Ensure adequate hydration.",
+      "onset": "Variable"
+    },
+    {
+      "drug_a": "digoxin", "drug_b": "amiodarone",
+      "severity": "major",
+      "mechanism": "Amiodarone inhibits P-glycoprotein and CYP3A4, reducing digoxin clearance",
+      "clinical_effect": "Digoxin toxicity: bradycardia, heart block, nausea, visual disturbances, arrhythmias",
+      "management": "Reduce digoxin dose by 50% when starting amiodarone. Monitor digoxin levels and heart rate/rhythm closely.",
+      "onset": "Days to weeks"
+    },
+    {
+      "drug_a": "clopidogrel", "drug_b": "omeprazole",
+      "severity": "moderate",
+      "mechanism": "Omeprazole inhibits CYP2C19, which activates clopidogrel to its active metabolite",
+      "clinical_effect": "Reduced antiplatelet effect of clopidogrel; potential increase in cardiovascular events (clinical significance debated)",
+      "management": "Use pantoprazole or famotidine as alternatives if GI protection needed with clopidogrel. FDA has issued safety communication about this interaction.",
+      "onset": "Rapid"
+    },
+    {
+      "drug_a": "lithium", "drug_b": "ibuprofen",
+      "severity": "major",
+      "mechanism": "NSAIDs reduce renal prostaglandin synthesis, decreasing lithium clearance",
+      "clinical_effect": "Lithium toxicity: tremor, confusion, ataxia, seizures, cardiac arrhythmias",
+      "management": "Avoid NSAIDs with lithium. Use acetaminophen for pain. If NSAID unavoidable, monitor lithium levels within 5 days and adjust dose.",
+      "onset": "Days"
+    },
+    {
+      "drug_a": "warfarin", "drug_b": "metronidazole",
+      "severity": "major",
+      "mechanism": "Metronidazole inhibits CYP2C9, reducing warfarin metabolism; also inhibits gut flora reducing vitamin K production",
+      "clinical_effect": "INR elevation of 30-50%; significant bleeding risk",
+      "management": "Reduce warfarin dose ~25%. Monitor INR 3-5 days after starting and after completing metronidazole course.",
+      "onset": "Rapid (2-3 days)"
+    },
+    {
+      "drug_a": "apixaban", "drug_b": "clarithromycin",
+      "severity": "moderate",
+      "mechanism": "Clarithromycin inhibits CYP3A4 and P-glycoprotein, increasing apixaban exposure",
+      "clinical_effect": "Increased apixaban levels ~60%; increased bleeding risk",
+      "management": "Use with caution. Consider using azithromycin instead of clarithromycin. No dose adjustment specified in labeling, but monitor for bleeding signs.",
+      "onset": "Rapid"
+    }
+  ]
+}

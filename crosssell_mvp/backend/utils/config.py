@@ -7,7 +7,10 @@ class Settings(BaseSettings):
     redis_url: str = "redis://localhost:6380/0"
     openai_api_key: str = ""
     openai_model_name: str = "gpt-4o-mini"
-    sendgrid_api_key: str = ""
+    smtp_host: str = "smtp.postmarkapp.com"
+    smtp_port: int = 587
+    smtp_username: str = ""
+    smtp_password: str = ""
     from_email: str = "membership@pharmacist.com"
     secret_key: str = "dev-secret-key"
     jwt_algorithm: str = "HS256"

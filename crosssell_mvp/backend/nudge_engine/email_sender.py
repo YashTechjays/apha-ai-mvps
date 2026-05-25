@@ -1,4 +1,8 @@
+import smtplib
+import uuid
 from datetime import datetime
+from email.mime.text import MIMEText
+
 from sqlalchemy.orm import Session
 from backend.db.models.member import Member
 from backend.db.models.nudge import Nudge
@@ -29,7 +33,7 @@ def send_email_nudge(member: Member, score: CrossSellScore, db: Session) -> Nudg
     db.commit()
     db.refresh(nudge)
 
-    if settings.env == "development" or not settings.sendgrid_api_key:
+    if settings.env == "development" or not settings.smtp_username:
         logger.info(
             f"[EMAIL MOCK] To: {member.email} | "
             f"Subject: {content['subject']} | Product: {score.product}"
@@ -39,19 +43,19 @@ def send_email_nudge(member: Member, score: CrossSellScore, db: Session) -> Nudg
         nudge.sendgrid_message_id = f"mock-{str(nudge.id)[:8]}"
     else:
         try:
-            import sendgrid
-            from sendgrid.helpers.mail import Mail
-            sg = sendgrid.SendGridAPIClient(api_key=settings.sendgrid_api_key)
-            msg = Mail(
-                from_email=(settings.from_email, "APhA Membership Team"),
-                to_emails=member.email,
-                subject=content["subject"],
-                plain_text_content=content["body"],
-            )
-            resp = sg.send(msg)
+            msg = MIMEText(content["body"], "plain")
+            msg["From"] = f"APhA Membership Team <{settings.from_email}>"
+            msg["To"] = member.email
+            msg["Subject"] = content["subject"]
+
+            with smtplib.SMTP(settings.smtp_host, settings.smtp_port) as server:
+                server.starttls()
+                server.login(settings.smtp_username, settings.smtp_password)
+                server.send_message(msg)
+
             nudge.status = "sent"
             nudge.sent_at = datetime.utcnow()
-            nudge.sendgrid_message_id = resp.headers.get("X-Message-Id", "unknown")
+            nudge.sendgrid_message_id = str(uuid.uuid4())
         except Exception as e:
             logger.error(f"Email send failed for {member.email}: {e}")
             nudge.status = "failed"

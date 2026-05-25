@@ -1,0 +1,90 @@
+{
+  "framework": "APhA Pharmacy Career Competency Framework 2025",
+  "dimensions": [
+    {
+      "id": "clinical_knowledge",
+      "name": "Clinical Knowledge",
+      "description": "Drug therapy, disease management, pharmacotherapy decision-making",
+      "weight": 0.25,
+      "apha_resources": ["CPE Learning Library", "JAPhA journal", "Pharmacotherapy certificates"],
+      "indicators": [
+        "Board certifications held (BCPS, BCACP, etc.)",
+        "CPE hours completed in last 2 years",
+        "Certificate programs completed",
+        "Specialized clinical training"
+      ]
+    },
+    {
+      "id": "patient_care",
+      "name": "Patient Care Skills",
+      "description": "Direct patient care, counseling, MTM, immunization delivery",
+      "weight": 0.20,
+      "apha_resources": ["Immunization certificate", "MTM certificate", "Motivational Interviewing certificate"],
+      "indicators": [
+        "Immunization certified",
+        "MTM services provided",
+        "Patient counseling experience",
+        "Point-of-care testing"
+      ]
+    },
+    {
+      "id": "professional_development",
+      "name": "Professional Development",
+      "description": "Career advancement, continuing education, professional involvement",
+      "weight": 0.20,
+      "apha_resources": ["APhA ADVANCE mentorship", "Career Pathways Program", "Annual Meeting"],
+      "indicators": [
+        "Professional association membership",
+        "Leadership roles held",
+        "Mentorship participation",
+        "Conference presentations"
+      ]
+    },
+    {
+      "id": "leadership",
+      "name": "Leadership & Advocacy",
+      "description": "Team leadership, advocacy, policy engagement, community involvement",
+      "weight": 0.15,
+      "apha_resources": ["APhA Advocacy Action Center", "APhA PAC", "APhA leadership roles"],
+      "indicators": [
+        "Management/supervisory experience",
+        "Advocacy activities",
+        "Community pharmacy programs led",
+        "Legislative engagement"
+      ]
+    },
+    {
+      "id": "business_acumen",
+      "name": "Business & Technology",
+      "description": "Financial management, technology adoption, workflow optimization",
+      "weight": 0.10,
+      "apha_resources": ["APhA practice management resources", "PharmacyLibrary business content"],
+      "indicators": [
+        "Practice management experience",
+        "Technology skills (EHR, automation)",
+        "Billing and reimbursement knowledge",
+        "Quality improvement projects"
+      ]
+    },
+    {
+      "id": "networking",
+      "name": "Professional Network",
+      "description": "Peer connections, mentorship, collaborative practice",
+      "weight": 0.10,
+      "apha_resources": ["APhA ENGAGE community", "Annual Meeting networking", "State association"],
+      "indicators": [
+        "Active in professional communities",
+        "Mentorship relationships",
+        "Collaborative practice agreements",
+        "Research collaborations"
+      ]
+    }
+  ],
+  "career_stages": {
+    "student": {"years": "0", "expected_score": 35, "focus": "Foundation building"},
+    "new_practitioner": {"years": "0-3", "expected_score": 52, "focus": "Skill development"},
+    "mid_career": {"years": "3-10", "expected_score": 68, "focus": "Specialization"},
+    "senior": {"years": "10-20", "expected_score": 78, "focus": "Leadership"},
+    "expert": {"years": "20+", "expected_score": 85, "focus": "Mentorship & influence"}
+  }
+}

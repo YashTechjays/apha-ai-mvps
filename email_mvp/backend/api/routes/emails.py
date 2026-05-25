@@ -84,42 +84,41 @@ def run_batch(
     return {"send_month": month, "dry_run": dry_run, **results}
 
 
-@router.post("/webhook/sendgrid")
-async def sendgrid_webhook(events: list[dict], db: Session = Depends(get_db)):
+@router.post("/webhook/postmark")
+async def postmark_webhook(payload: dict, db: Session = Depends(get_db)):
     import uuid
     from backend.db.models.email_event import EmailEvent
 
-    processed = 0
-    for event in events:
-        sg_id = event.get("sg_message_id", "")
-        send = db.query(EmailSend).filter(EmailSend.sendgrid_message_id == sg_id).first()
-        if not send:
-            continue
+    message_id = payload.get("MessageID", "")
+    send = db.query(EmailSend).filter(EmailSend.sendgrid_message_id == message_id).first()
+    if not send:
+        return {"processed": 0}
 
-        event_type = event.get("event", "")
-        ev = EmailEvent(
-            id=str(uuid.uuid4()),
-            email_send_id=send.id,
-            member_id=send.member_id,
-            event_type=event_type,
-            sendgrid_event_id=sg_id,
-            url_clicked=event.get("url"),
-            user_agent=event.get("useragent"),
-            ip_address=event.get("ip"),
-            raw_payload=event,
-        )
-        db.add(ev)
+    record_type = payload.get("RecordType", "")
+    event_map = {"Open": "open", "Click": "click", "Bounce": "bounce"}
+    event_type = event_map.get(record_type, record_type.lower())
 
-        if event_type == "open" and not send.opened:
-            send.opened = True
-            send.first_open_at = datetime.utcnow()
-        elif event_type == "click":
-            send.clicked = True
-            send.click_count += 1
-            if not send.first_click_at:
-                send.first_click_at = datetime.utcnow()
+    ev = EmailEvent(
+        id=str(uuid.uuid4()),
+        email_send_id=send.id,
+        member_id=send.member_id,
+        event_type=event_type,
+        sendgrid_event_id=message_id,
+        url_clicked=payload.get("OriginalLink"),
+        user_agent=payload.get("UserAgent"),
+        ip_address=payload.get("Geo", {}).get("IP") if isinstance(payload.get("Geo"), dict) else None,
+        raw_payload=payload,
+    )
+    db.add(ev)
 
-        processed += 1
+    if event_type == "open" and not send.opened:
+        send.opened = True
+        send.first_open_at = datetime.utcnow()
+    elif event_type == "click":
+        send.clicked = True
+        send.click_count += 1
+        if not send.first_click_at:
+            send.first_click_at = datetime.utcnow()
 
     db.commit()
-    return {"processed": processed}
+    return {"processed": 1}

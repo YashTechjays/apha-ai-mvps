@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ subject }}</title>
+  <style>
+    body { margin: 0; padding: 0; background: #f4f6f9; font-family: Georgia, serif; color: #222; }
+    .wrapper { max-width: 620px; margin: 32px auto; background: #fff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
+    .header { background: #1B4F8A; padding: 28px 32px; }
+    .header img { height: 36px; }
+    .header h1 { color: #fff; font-size: 20px; margin: 12px 0 0; font-weight: 400; letter-spacing: .5px; }
+    .body { padding: 32px; }
+    .greeting { font-size: 16px; margin-bottom: 24px; line-height: 1.6; }
+    .value-banner { background: #e8f0fb; border-left: 4px solid #1B4F8A; padding: 16px 20px; border-radius: 4px; margin-bottom: 28px; }
+    .value-banner .amount { font-size: 36px; font-weight: 700; color: #1B4F8A; }
+    .value-banner .label { font-size: 13px; color: #555; margin-top: 2px; }
+    .roi-badge { display: inline-block; background: #1B4F8A; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 13px; margin-top: 8px; }
+    .section-title { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: #1B4F8A; font-family: Arial, sans-serif; margin-bottom: 12px; font-weight: 700; }
+    .benefits-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 28px; }
+    .benefit-card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; padding: 14px 16px; }
+    .benefit-card .name { font-size: 12px; color: #666; font-family: Arial, sans-serif; text-transform: uppercase; letter-spacing: .5px; }
+    .benefit-card .value { font-size: 22px; font-weight: 700; color: #1B4F8A; margin: 4px 0 2px; }
+    .benefit-card .detail { font-size: 12px; color: #888; }
+    .highlights { margin-bottom: 28px; }
+    .highlight-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; font-size: 15px; line-height: 1.5; }
+    .highlight-item::before { content: "✓"; color: #1B4F8A; font-weight: 700; flex-shrink: 0; margin-top: 1px; }
+    .recommendation { background: #fffbeb; border: 1px solid #fcd34d; border-radius: 6px; padding: 16px 20px; margin-bottom: 28px; font-size: 14px; line-height: 1.6; }
+    .recommendation strong { display: block; margin-bottom: 4px; font-family: Arial, sans-serif; }
+    .cta-block { text-align: center; margin-bottom: 28px; }
+    .cta-btn { display: inline-block; background: #1B4F8A; color: #fff !important; text-decoration: none; padding: 13px 32px; border-radius: 6px; font-family: Arial, sans-serif; font-size: 15px; font-weight: 600; letter-spacing: .3px; }
+    .closing { font-size: 15px; line-height: 1.7; color: #444; margin-bottom: 8px; }
+    .signature { font-size: 14px; color: #666; }
+    .footer { background: #f4f6f9; padding: 20px 32px; font-size: 12px; color: #888; font-family: Arial, sans-serif; line-height: 1.6; border-top: 1px solid #e5e7eb; }
+    .footer a { color: #1B4F8A; }
+    @media (max-width: 480px) {
+      .benefits-grid { grid-template-columns: 1fr; }
+      .body { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+<div class="wrapper">
+  <div class="header">
+    <div style="font-size:22px;font-weight:700;color:#fff;letter-spacing:1px;">APhA</div>
+    <h1>Your Monthly Member Value Report</h1>
+  </div>
+  <div class="body">
+    <div class="greeting">{{ greeting }}</div>
+
+    <div class="value-banner">
+      <div class="amount">${{ "%.0f"|format(total_value_usd) }}</div>
+      <div class="label">Total value received from your APhA membership</div>
+      <div class="roi-badge">{{ roi_multiplier }}x return on your ${{ "%.0f"|format(membership_fee_usd) }} investment</div>
+    </div>
+
+    <p class="section-title">Your Benefit Breakdown</p>
+    <div class="benefits-grid">
+      {% if cpe_value_usd > 0 %}
+      <div class="benefit-card">
+        <div class="name">CPE Credits</div>
+        <div class="value">${{ "%.0f"|format(cpe_value_usd) }}</div>
+        <div class="detail">{{ cpe_credits_ytd }} credits · {{ cpe_courses_completed }} courses</div>
+      </div>
+      {% endif %}
+      {% if webinar_value_usd > 0 %}
+      <div class="benefit-card">
+        <div class="name">Webinars</div>
+        <div class="value">${{ "%.0f"|format(webinar_value_usd) }}</div>
+        <div class="detail">{{ webinars_attended_ytd }} sessions attended</div>
+      </div>
+      {% endif %}
+      {% if journal_value_usd > 0 %}
+      <div class="benefit-card">
+        <div class="name">JAPhA Journal</div>
+        <div class="value">${{ "%.0f"|format(journal_value_usd) }}</div>
+        <div class="detail">{{ journal_articles_read_ytd }} articles read</div>
+      </div>
+      {% endif %}
+      {% if pharmacylibrary_value_usd > 0 %}
+      <div class="benefit-card">
+        <div class="name">PharmacyLibrary</div>
+        <div class="value">${{ "%.0f"|format(pharmacylibrary_value_usd) }}</div>
+        <div class="detail">{{ pharmacylibrary_sessions_ytd }} sessions</div>
+      </div>
+      {% endif %}
+      {% if events_value_usd > 0 %}
+      <div class="benefit-card">
+        <div class="name">Events & Meetings</div>
+        <div class="value">${{ "%.0f"|format(events_value_usd) }}</div>
+        <div class="detail">{{ "Annual Meeting + " if annual_meeting_attended else "" }}{{ events_registered_ytd }} event(s)</div>
+      </div>
+      {% endif %}
+    </div>
+
+    <p class="section-title">Highlights</p>
+    <div class="highlights">
+      {% for item in highlights %}
+      <div class="highlight-item">{{ item }}</div>
+      {% endfor %}
+    </div>
+
+    <div class="recommendation">
+      <strong>Maximize Your Membership</strong>
+      {{ recommendation }}
+    </div>
+
+    <div class="cta-block">
+      <a href="https://pharmacist.com/member-portal" class="cta-btn">{{ cta }}</a>
+    </div>
+
+    <div class="closing">{{ closing }}</div>
+    <div class="signature">
+      <br/>Warmly,<br/>
+      <strong>APhA Membership Team</strong><br/>
+      American Pharmacists Association
+    </div>
+  </div>
+  <div class="footer">
+    You're receiving this because you're an APhA member. &nbsp;|&nbsp;
+    <a href="https://pharmacist.com/unsubscribe">Unsubscribe</a> &nbsp;|&nbsp;
+    <a href="https://pharmacist.com/privacy">Privacy Policy</a><br/>
+    2215 Constitution Ave NW, Washington, DC 20037
+  </div>
+</div>
+</body>
+</html>

@@ -32,8 +32,11 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_MODEL_NAME=${OPENAI_MODEL_NAME:-gpt-4o-mini}
-      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
-      - FROM_EMAIL=membership@pharmacist.com
+      - SMTP_HOST=${SMTP_HOST:-smtp.postmarkapp.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - FROM_EMAIL=${SMTP_FROM_EMAIL:-membership@pharmacist.com}
       - SECRET_KEY=dev-secret-key
       - ENV=development
     depends_on:
@@ -42,9 +45,9 @@ services:
       redis:
         condition: service_healthy
     volumes:
-      - ./backend:/app
+      - ./backend:/app/backend
       - mlflow_data:/app/mlruns
-    command: uvicorn main:app --host 0.0.0.0 --port 8004 --reload
+    command: uvicorn backend.main:app --host 0.0.0.0 --port 8004 --reload
   celery_worker:
     build: ./backend
     environment:
@@ -52,13 +55,16 @@ services:
       - REDIS_URL=redis://redis:6379/0
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - OPENAI_MODEL_NAME=${OPENAI_MODEL_NAME:-gpt-4o-mini}
-      - SENDGRID_API_KEY=${SENDGRID_API_KEY}
+      - SMTP_HOST=${SMTP_HOST:-smtp.postmarkapp.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
       - ENV=development
     depends_on:
       - redis
       - postgres
     volumes:
-      - ./backend:/app
+      - ./backend:/app/backend
     command: celery -A backend.nudge_engine.tasks worker --loglevel=info
   frontend:
     image: node:20-alpine

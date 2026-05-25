@@ -26,9 +26,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(members.router)
-app.include_router(emails.router)
-app.include_router(analytics.router)
+app.include_router(members.router, prefix="/api")
+app.include_router(emails.router, prefix="/api")
+app.include_router(analytics.router, prefix="/api")
 
 
 @app.on_event("startup")
