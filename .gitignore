@@ -104,6 +104,16 @@ test-results/
 .playwright-mcp/
 blob-report/
 
+# ---- Celery ----
+celerybeat-schedule
+celerybeat-schedule.*
+celerybeat.pid
+
+# ---- Screenshots / Demo artifacts ----
+screenshots/
+e2e-*.png
+feature*.png
+
 # ---- Misc ----
 *.bak
 *.tmp

@@ -1,0 +1,109 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: apha
+      POSTGRES_PASSWORD: apha_secret
+      POSTGRES_DB: rfp_graph_db
+    ports:
+      - "5441:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U apha"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  neo4j:
+    image: neo4j:5-community
+    environment:
+      NEO4J_AUTH: neo4j/apha_secret
+      NEO4J_PLUGINS: '["apoc"]'
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p apha_secret 'RETURN 1' || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6384:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 5
+  backend:
+    build: ./backend
+    ports:
+      - "8009:8009"
+    environment:
+      - DATABASE_URL=postgresql://apha:apha_secret@postgres:5432/rfp_graph_db
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=apha_secret
+      - REDIS_URL=redis://redis:6379/0
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL_NAME=${OPENAI_MODEL_NAME:-gpt-4o-mini}
+      - FIRECRAWL_API_KEY=${FIRECRAWL_API_KEY}
+      - SECRET_KEY=dev-secret-key
+      - ENV=development
+      - SMTP_HOST=${SMTP_HOST:-smtp.postmarkapp.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_FROM_EMAIL=${SMTP_FROM_EMAIL:-yash@theagentic.ai}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3009}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      neo4j:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app/backend
+    command: uvicorn backend.main:app --host 0.0.0.0 --port 8009 --reload
+  celery_worker:
+    build: ./backend
+    environment:
+      - DATABASE_URL=postgresql://apha:apha_secret@postgres:5432/rfp_graph_db
+      - NEO4J_URI=bolt://neo4j:7687
+      - NEO4J_USER=neo4j
+      - NEO4J_PASSWORD=apha_secret
+      - REDIS_URL=redis://redis:6379/0
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_MODEL_NAME=${OPENAI_MODEL_NAME:-gpt-4o-mini}
+      - FIRECRAWL_API_KEY=${FIRECRAWL_API_KEY}
+      - ENV=development
+      - SMTP_HOST=${SMTP_HOST:-smtp.postmarkapp.com}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_FROM_EMAIL=${SMTP_FROM_EMAIL:-yash@theagentic.ai}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3009}
+    depends_on:
+      - redis
+      - postgres
+      - neo4j
+    volumes:
+      - ./backend:/app/backend
+    command: celery -A backend.crawler.scheduler worker --loglevel=info --beat
+  frontend:
+    image: node:20-alpine
+    working_dir: /app
+    ports:
+      - "3009:3009"
+    volumes:
+      - ./frontend:/app
+    command: sh -c "npm install && npm run dev -- --host --port 3009"
+    environment:
+      - VITE_API_URL=http://localhost:8009
+volumes:
+  postgres_data:
+  neo4j_data:
