@@ -5,6 +5,7 @@ import StatusBadge from '../components/StatusBadge'
 import WinRoomModal from '../components/WinRoomModal'
 import CoalitionPanel from '../components/CoalitionPanel'
 import SimulatorPanel from '../components/SimulatorPanel'
+import { sourceLabel } from '../utils/source'
 
 function getRole() {
   return localStorage.getItem('role') || 'admin'
@@ -178,6 +179,15 @@ export default function RfpDetailPage() {
             <div>
               <span className="text-gray-500 block">Posted</span>
               <span className="font-medium">{rfp.posted_date}</span>
+            </div>
+          )}
+          {rfp.source_url && (
+            <div>
+              <span className="text-gray-500 block">Source</span>
+              <a href={rfp.source_url} target="_blank" rel="noopener noreferrer"
+                className="font-medium text-blue-600 hover:underline">
+                {sourceLabel(rfp)}
+              </a>
             </div>
           )}
           {rfp.budget_range && (

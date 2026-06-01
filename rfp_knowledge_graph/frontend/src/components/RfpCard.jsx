@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import StatusBadge from './StatusBadge'
+import { sourceLabel } from '../utils/source'
 
 function MatchBadge({ score }) {
   if (score == null) return null
@@ -33,6 +34,10 @@ export default function RfpCard({ rfp }) {
 
       {rfp.location && (
         <p className="text-xs text-gray-400 mb-2">{rfp.location}</p>
+      )}
+
+      {sourceLabel(rfp) && (
+        <p className="text-xs text-gray-400 mb-2">Source: {sourceLabel(rfp)}</p>
       )}
 
       <div className="flex flex-wrap gap-1 mb-3">

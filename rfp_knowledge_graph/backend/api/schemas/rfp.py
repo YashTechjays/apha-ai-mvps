@@ -10,6 +10,8 @@ class RfpSummary(BaseModel):
     posted_date: Optional[str] = None
     status: str = "open"
     url: str = ""
+    source_url: str = ""
+    source_name: str = ""
     budget_range: Optional[str] = None
     organization_name: Optional[str] = None
     location: Optional[str] = None
@@ -38,6 +40,7 @@ class RfpDetail(BaseModel):
     status: str = "open"
     url: str = ""
     source_url: str = ""
+    source_name: str = ""
     budget_range: Optional[str] = None
     contact_name: Optional[str] = None
     contact_email: Optional[str] = None

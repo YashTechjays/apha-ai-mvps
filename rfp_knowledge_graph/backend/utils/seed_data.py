@@ -1,6 +1,7 @@
 import uuid
 from backend.graph.queries import create_rfp_with_relations, get_graph_stats
 from backend.utils.logger import get_logger
+from backend.utils.sources import resolve_source
 
 logger = get_logger("seed_data")
 
@@ -510,7 +511,7 @@ def seed_demo_ai_data():
 
     logger.info("Seeding AI demo data (forecast history, pharmacists, applications)...")
     for rfp in FORECAST_HISTORY + DEMO_OPEN_RFPS:
-        create_rfp_with_relations(rfp)
+        create_rfp_with_relations({**rfp, **resolve_source(rfp)})
 
     for p in DEMO_PHARMACISTS:
         sync_pharmacist_profile_to_graph(
@@ -532,7 +533,7 @@ def seed_graph():
     if stats["total_rfps"] == 0:
         logger.info(f"Seeding {len(MOCK_RFPS)} mock RFPs into Neo4j...")
         for rfp in MOCK_RFPS:
-            create_rfp_with_relations(rfp)
+            create_rfp_with_relations({**rfp, **resolve_source(rfp)})
         logger.info("Seed data complete")
     else:
         logger.info(f"Graph already has {stats['total_rfps']} RFPs, skipping mock seed")

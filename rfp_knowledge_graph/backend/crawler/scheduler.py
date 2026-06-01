@@ -147,6 +147,7 @@ def run_crawl_job(job_id: str):
     from backend.crawler.firecrawl_client import crawl_url
     from backend.ai.entity_extractor import extract_rfp_entities
     from backend.graph.queries import create_rfp_with_relations
+    from backend.utils.sources import friendly_source_name
 
     db = SessionLocal()
     try:
@@ -172,6 +173,10 @@ def run_crawl_job(job_id: str):
                 for rfp_data in rfps:
                     if not rfp_data.get("url"):
                         rfp_data["url"] = page["url"]
+                    rfp_data.setdefault(
+                        "source_name",
+                        friendly_source_name(rfp_data.get("source_url") or page["url"]),
+                    )
                     rfp_id = create_rfp_with_relations(rfp_data)
                     new_rfp_ids.append(rfp_id)
                     total_rfps += 1
